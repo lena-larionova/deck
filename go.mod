@@ -2,6 +2,8 @@ module github.com/kong/deck
 
 go 1.16
 
+replace github.com/imdario/mergo v0.3.12 => github.com/Kong/mergo v0.3.13
+
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20191017121752-4bb6e3fae4f2
 	github.com/blang/semver/v4 v4.0.0
@@ -14,7 +16,7 @@ require (
 	github.com/hashicorp/go-memdb v1.3.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.12
-	github.com/kong/go-kong v0.25.2-0.20220123181121-e965de22d701
+	github.com/kong/go-kong v0.26.1-0.20220202091525-41b8c6b6b360
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.12
@@ -29,5 +31,5 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	k8s.io/code-generator v0.23.1
+	k8s.io/code-generator v0.23.3
 )
