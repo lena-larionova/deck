@@ -469,6 +469,7 @@ func populateCACertificates(kongState *state.KongState, file *Content,
 	}
 	for _, c := range caCertificates {
 		c := FCACertificate{CACertificate: c.CACertificate}
+		utils.ZeroOutID(&c, c.CertDigest, config.WithID)
 		utils.ZeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c.CACertificate, config.SelectTags)
 		file.CACertificates = append(file.CACertificates, c)
