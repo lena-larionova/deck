@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
@@ -45,6 +46,29 @@ func getKonnectClient(ctx context.Context) (*kong.Client, error) {
 		Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
+	})
+}
+
+func dumpKonnectV2(ctx context.Context) error {
+	client, err := getKonnectClient(ctx)
+	if err != nil {
+		return err
+	}
+	if dumpCmdKongStateFile == "-" {
+		return fmt.Errorf("writing to stdout is not supported in Konnect mode")
+	}
+	rawState, err := dump.Get(ctx, client, dumpConfig)
+	if err != nil {
+		return fmt.Errorf("reading configuration from Kong: %w", err)
+	}
+	ks, err := state.Get(rawState)
+	if err != nil {
+		return fmt.Errorf("building state: %w", err)
+	}
+	return file.KongStateToFile(ks, file.WriteConfig{
+		Filename:   dumpCmdKongStateFile,
+		FileFormat: file.Format(strings.ToUpper(konnectDumpCmdStateFormat)),
+		WithID:     dumpWithID,
 	})
 }
 

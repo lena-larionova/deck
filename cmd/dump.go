@@ -48,6 +48,17 @@ configure Kong.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 
+			if yes, err := utils.ConfirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
+				return err
+			} else if !yes {
+				return nil
+			}
+
+			if konnectConfig.Email != "" {
+				_ = sendAnalytics("konnect-dump", "")
+				return dumpKonnectV2(ctx)
+			}
+
 			wsClient, err := utils.GetKongClient(rootConfig)
 			if err != nil {
 				return err
@@ -99,12 +110,6 @@ configure Kong.`,
 						return err
 					}
 				}
-				return nil
-			}
-
-			if yes, err := utils.ConfirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
-				return err
-			} else if !yes {
 				return nil
 			}
 
