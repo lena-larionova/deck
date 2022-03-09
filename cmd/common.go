@@ -64,7 +64,9 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string) error {
-
+	if konnectConfig.Email != "" {
+		return syncKonnectV2(ctx, filenames, dry, parallelism)
+	}
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {

@@ -15,6 +15,100 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+func getKonnectClient(ctx context.Context) (*kong.Client, error) {
+	httpClient := utils.HTTPClient()
+	// get Konnect client
+	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// authenticate with konnect
+	_, err = konnectClient.Auth.Login(ctx,
+		konnectConfig.Email,
+		konnectConfig.Password)
+	if err != nil {
+		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
+	}
+
+	// get kong control plane ID
+	kongCPID, err := fetchKongControlPlaneID(ctx, konnectClient)
+	if err != nil {
+		return nil, err
+	}
+
+	// set the kong control plane ID in the client
+	konnectClient.SetControlPlaneID(kongCPID)
+
+	// initialize kong client
+	return utils.GetKongClient(utils.KongClientConfig{
+		Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
+		HTTPClient: httpClient,
+		Debug:      konnectConfig.Debug,
+	})
+}
+
+func syncKonnectV2(ctx context.Context,
+	filenames []string, dry bool, parallelism int) error {
+	client, err := getKonnectClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	// read target file
+	targetContent, err := file.GetContentFromFiles(filenames)
+	if err != nil {
+		return err
+	}
+	if dumpConfig.SkipConsumers {
+		targetContent.Consumers = []file.FConsumer{}
+	}
+
+	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
+	if err != nil {
+		return err
+	}
+
+	currentState, err := fetchCurrentState(ctx, client, dumpConfig)
+	if err != nil {
+		return err
+	}
+
+	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
+		CurrentState: currentState,
+	}, dumpConfig, client)
+	if err != nil {
+		return err
+	}
+
+	targetState, err := state.Get(rawState)
+	if err != nil {
+		return err
+	}
+
+	s, err := diff.NewSyncer(diff.SyncerOpts{
+		CurrentState: currentState,
+		TargetState:  targetState,
+		KongClient:   client,
+	})
+	if err != nil {
+		return err
+	}
+
+	stats, errs := s.Solve(ctx, parallelism, dry)
+	// print stats before error to report completed operations
+	printStats(stats)
+	if errs != nil {
+		return utils.ErrArray{Errors: errs}
+	}
+	if diffCmdNonZeroExitCode &&
+		stats.CreateOps.Count()+stats.UpdateOps.Count()+stats.DeleteOps.Count() != 0 {
+		os.Exit(exitCodeDiffDetection)
+	}
+
+	return nil
+}
+
 func syncKonnect(ctx context.Context,
 	filenames []string, dry bool, parallelism int) error {
 	httpClient := utils.HTTPClient()
