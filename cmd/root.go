@@ -154,6 +154,28 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("tls-client-key",
 		rootCmd.PersistentFlags().Lookup("tls-client-key-file"))
 
+	// konnect-specific flags
+	rootCmd.PersistentFlags().String("konnect-email", "",
+		"Email address associated with your Konnect account.")
+	viper.BindPFlag("konnect-email",
+		rootCmd.PersistentFlags().Lookup("konnect-email"))
+
+	rootCmd.PersistentFlags().String("konnect-password", "",
+		"Password associated with your Konnect account, "+
+			"this takes precedence over --konnect-password-file flag.")
+	viper.BindPFlag("konnect-password",
+		rootCmd.PersistentFlags().Lookup("konnect-password"))
+
+	rootCmd.PersistentFlags().String("konnect-password-file", "",
+		"File containing the password to your Konnect account.")
+	viper.BindPFlag("konnect-password-file",
+		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
+
+	rootCmd.PersistentFlags().String("konnect-addr", "https://konnect.konghq.com",
+		"Address of the Konnect endpoint.")
+	viper.BindPFlag("konnect-addr",
+		rootCmd.PersistentFlags().Lookup("konnect-addr"))
+
 	rootCmd.AddCommand(newSyncCmd())
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(newValidateCmd())
