@@ -22,6 +22,7 @@ type WriteConfig struct {
 	Filename   string
 	FileFormat Format
 	WithID     bool
+	Konnect    bool
 }
 
 func compareOrder(obj1, obj2 sortable) bool {
@@ -37,6 +38,9 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 	file.Workspace = config.Workspace
 	// hardcoded as only one version exists currently
 	file.FormatVersion = "1.1"
+	if config.Konnect {
+		file.Konnect = true
+	}
 
 	selectTags := config.SelectTags
 	if len(selectTags) > 0 {

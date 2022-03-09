@@ -69,23 +69,15 @@ func dumpKonnectV2(ctx context.Context) error {
 		Filename:   dumpCmdKongStateFile,
 		FileFormat: file.Format(strings.ToUpper(konnectDumpCmdStateFormat)),
 		WithID:     dumpWithID,
+		Konnect:    true,
 	})
 }
 
 func syncKonnectV2(ctx context.Context,
-	filenames []string, dry bool, parallelism int) error {
+	targetContent *file.Content, dry bool, parallelism int) error {
 	client, err := getKonnectClient(ctx)
 	if err != nil {
 		return err
-	}
-
-	// read target file
-	targetContent, err := file.GetContentFromFiles(filenames)
-	if err != nil {
-		return err
-	}
-	if dumpConfig.SkipConsumers {
-		targetContent.Consumers = []file.FConsumer{}
 	}
 
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)

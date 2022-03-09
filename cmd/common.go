@@ -64,9 +64,6 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string) error {
-	if konnectConfig.Email != "" {
-		return syncKonnectV2(ctx, filenames, dry, parallelism)
-	}
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
@@ -74,6 +71,10 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 	if dumpConfig.SkipConsumers {
 		targetContent.Consumers = []file.FConsumer{}
+	}
+
+	if runOnKonnect || targetContent.Konnect {
+		return syncKonnectV2(ctx, targetContent, dry, parallelism)
 	}
 
 	rootClient, err := utils.GetKongClient(rootConfig)

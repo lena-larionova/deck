@@ -601,6 +601,7 @@ type Content struct {
 	Transform     *bool  `json:"_transform,omitempty" yaml:"_transform,omitempty"`
 	Info          *Info  `json:"_info,omitempty" yaml:"_info,omitempty"`
 	Workspace     string `json:"_workspace,omitempty" yaml:"_workspace,omitempty"`
+	Konnect       bool   `json:"_konnect,omitempty" yaml:"_konnect,omitempty"`
 
 	Services       []FService       `json:"services,omitempty" yaml:",omitempty"`
 	Routes         []FRoute         `json:"routes,omitempty" yaml:",omitempty"`

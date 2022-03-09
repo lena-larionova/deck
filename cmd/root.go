@@ -21,6 +21,8 @@ var (
 	konnectConfig utils.KonnectConfig
 
 	disableAnalytics bool
+
+	runOnKonnect bool
 )
 
 //nolint:errcheck
@@ -176,6 +178,11 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-addr",
 		rootCmd.PersistentFlags().Lookup("konnect-addr"))
 
+	rootCmd.PersistentFlags().Bool("konnect", false,
+		"Run decK against Konnect.")
+	viper.BindPFlag("konnect",
+		rootCmd.PersistentFlags().Lookup("konnect"))
+
 	rootCmd.AddCommand(newSyncCmd())
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(newValidateCmd())
@@ -326,5 +333,6 @@ func initKonnectConfig() error {
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")
 	konnectConfig.Headers = viper.GetStringSlice("headers")
+	runOnKonnect = viper.GetBool("konnect")
 	return nil
 }

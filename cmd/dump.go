@@ -54,7 +54,7 @@ configure Kong.`,
 				return nil
 			}
 
-			if konnectConfig.Email != "" {
+			if runOnKonnect {
 				_ = sendAnalytics("konnect-dump", "")
 				return dumpKonnectV2(ctx)
 			}
