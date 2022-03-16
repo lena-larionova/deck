@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	authEndpoint = "/api/auth"
+	authEndpoint   = "/api/auth"
+	authEndpointV2 = "/kauth/api/v1/authenticate"
 )
 
 type ParentInfoer interface {
@@ -132,4 +133,6 @@ type AuthResponse struct {
 	FirstName      string `json:"first_name"`
 	LastName       string `json:"last_name"`
 	OrganizationID string `json:"org_id"`
+
+	FullName string `json:"full_name"`
 }

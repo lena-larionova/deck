@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -18,6 +19,25 @@ can connect to Kong's Admin API.`,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+
+			if konnectRuntimeGroup != "" {
+				_ = sendAnalytics("konnect-ping", "")
+				client, err := utils.GetKonnectClient(nil, konnectConfig)
+				if err != nil {
+					return err
+				}
+				res, err := client.Auth.LoginV2(cmd.Context(), konnectConfig.Email,
+					konnectConfig.Password)
+				if err != nil {
+					return fmt.Errorf("authenticating with Konnect: %w", err)
+				}
+				fmt.Printf("Successfully Konnected as %s (%s)!\n",
+					res.FullName, res.Organization)
+				if konnectConfig.Debug {
+					fmt.Printf("Organization ID: %s\n", res.OrganizationID)
+				}
+				return nil
+			}
 
 			wsConfig := rootConfig.ForWorkspace(pingWorkspace)
 			version, err := fetchKongVersion(ctx, wsConfig)

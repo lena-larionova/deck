@@ -173,7 +173,7 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-password-file",
 		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
 
-	rootCmd.PersistentFlags().String("konnect-addr", "https://konnect.konghq.com",
+	rootCmd.PersistentFlags().String("konnect-addr", "https://api.konghq.tech",
 		"Address of the Konnect endpoint.")
 	viper.BindPFlag("konnect-addr",
 		rootCmd.PersistentFlags().Lookup("konnect-addr"))
