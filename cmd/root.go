@@ -22,7 +22,7 @@ var (
 
 	disableAnalytics bool
 
-	runOnKonnect bool
+	konnectRuntimeGroup string
 )
 
 //nolint:errcheck
@@ -178,10 +178,10 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-addr",
 		rootCmd.PersistentFlags().Lookup("konnect-addr"))
 
-	rootCmd.PersistentFlags().Bool("konnect", false,
-		"Run decK against Konnect.")
-	viper.BindPFlag("konnect",
-		rootCmd.PersistentFlags().Lookup("konnect"))
+	rootCmd.PersistentFlags().String("konnect-runtime-group", "",
+		"Konnect Runtime group name.")
+	viper.BindPFlag("konnect-runtime-group",
+		rootCmd.PersistentFlags().Lookup("konnect-runtime-group"))
 
 	rootCmd.AddCommand(newSyncCmd())
 	rootCmd.AddCommand(newVersionCmd())
@@ -333,6 +333,6 @@ func initKonnectConfig() error {
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")
 	konnectConfig.Headers = viper.GetStringSlice("headers")
-	runOnKonnect = viper.GetBool("konnect")
+	konnectRuntimeGroup = viper.GetString("konnect-runtime-group")
 	return nil
 }

@@ -54,7 +54,7 @@ configure Kong.`,
 				return nil
 			}
 
-			if runOnKonnect {
+			if konnectRuntimeGroup != "" {
 				_ = sendAnalytics("konnect-dump", "")
 				return dumpKonnectV2(ctx)
 			}

@@ -17,12 +17,12 @@ import (
 
 // WriteConfig holds settings to use to write the state file.
 type WriteConfig struct {
-	Workspace  string
-	SelectTags []string
-	Filename   string
-	FileFormat Format
-	WithID     bool
-	Konnect    bool
+	Workspace        string
+	SelectTags       []string
+	Filename         string
+	FileFormat       Format
+	WithID           bool
+	RuntimeGroupName string
 }
 
 func compareOrder(obj1, obj2 sortable) bool {
@@ -38,8 +38,10 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 	file.Workspace = config.Workspace
 	// hardcoded as only one version exists currently
 	file.FormatVersion = "1.1"
-	if config.Konnect {
-		file.Konnect = true
+	if config.RuntimeGroupName != "" {
+		file.Konnect = &Konnect{
+			RuntimeGroupName: config.RuntimeGroupName,
+		}
 	}
 
 	selectTags := config.SelectTags

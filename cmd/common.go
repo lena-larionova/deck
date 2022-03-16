@@ -73,7 +73,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		targetContent.Consumers = []file.FConsumer{}
 	}
 
-	if runOnKonnect || targetContent.Konnect {
+	if konnectRuntimeGroup != "" || targetContent.Konnect != nil {
 		return syncKonnectV2(ctx, targetContent, dry, parallelism)
 	}
 
