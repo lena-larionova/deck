@@ -16,6 +16,9 @@ var defaultCtx = context.Background()
 type service struct {
 	client         *Client
 	controlPlaneID string
+
+	// helium
+	runtimeGroupID string
 }
 
 // Client talks to the Konnect API.
@@ -31,6 +34,9 @@ type Client struct {
 	ControlPlaneRelations *ControlPlaneRelationsService
 	logger                io.Writer
 	debug                 bool
+
+	// helium
+	RuntimeGroups *RuntimeGroupService
 }
 
 // ClientOpts contains configuration options for a new Client.
@@ -59,6 +65,9 @@ func NewClient(httpClient *http.Client, opts ClientOpts) (*Client, error) {
 	client.ControlPlanes = (*ControlPlaneService)(&client.common)
 	client.ControlPlaneRelations = (*ControlPlaneRelationsService)(&client.common)
 	client.logger = os.Stderr
+
+	// helium
+	client.RuntimeGroups = (*RuntimeGroupService)(&client.common)
 	return client, nil
 }
 
@@ -66,6 +75,12 @@ func NewClient(httpClient *http.Client, opts ClientOpts) (*Client, error) {
 // This is used to inject the control-plane ID in requests as needed.
 func (c *Client) SetControlPlaneID(cpID string) {
 	c.common.controlPlaneID = cpID
+}
+
+// SetControlPlaneID sets the kong control-plane ID in the client.
+// This is used to inject the control-plane ID in requests as needed.
+func (c *Client) SetRuntimeGroupID(rgID string) {
+	c.common.runtimeGroupID = rgID
 }
 
 // Do executes a HTTP request and returns a response

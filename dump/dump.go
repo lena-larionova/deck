@@ -23,6 +23,9 @@ type Config struct {
 	// SelectorTags can be used to export entities tagged with only specific
 	// tags.
 	SelectorTags []string
+
+	// KonnectRuntimeGroup
+	KonnectRuntimeGroup string
 }
 
 func deduplicate(stringSlice []string) []string {

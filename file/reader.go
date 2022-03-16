@@ -77,6 +77,9 @@ func Get(ctx context.Context, fileContent *Content, opt RenderConfig, dumpConfig
 	builder.kongVersion = opt.KongVersion
 	builder.client = wsClient
 	builder.ctx = ctx
+	if dumpConfig.KonnectRuntimeGroup != "" {
+		builder.disableDynamicDefaults = true
+	}
 	if len(dumpConfig.SelectorTags) > 0 {
 		builder.selectTags = dumpConfig.SelectorTags
 	}

@@ -25,25 +25,25 @@ func getKonnectClient(ctx context.Context) (*kong.Client, error) {
 	}
 
 	// authenticate with konnect
-	_, err = konnectClient.Auth.Login(ctx,
+	_, err = konnectClient.Auth.LoginV2(ctx,
 		konnectConfig.Email,
 		konnectConfig.Password)
 	if err != nil {
 		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
 	}
 
-	// get kong control plane ID
-	kongCPID, err := fetchKongControlPlaneID(ctx, konnectClient)
+	// get kong runtime group ID
+	kongRGID, err := fetchKongRuntimeGroupID(ctx, konnectClient)
 	if err != nil {
 		return nil, err
 	}
 
-	// set the kong control plane ID in the client
-	konnectClient.SetControlPlaneID(kongCPID)
+	// set the kong runtime group ID in the client
+	konnectClient.SetRuntimeGroupID(kongRGID)
 
 	// initialize kong client
 	return utils.GetKongClient(utils.KongClientConfig{
-		Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
+		Address:    konnectConfig.Address + "/konnect-api/api/runtime_groups/" + kongRGID,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
 	})
@@ -75,10 +75,15 @@ func dumpKonnectV2(ctx context.Context) error {
 
 func syncKonnectV2(ctx context.Context,
 	targetContent *file.Content, dry bool, parallelism int) error {
+	if targetContent.Konnect.RuntimeGroupName != "" {
+		konnectRuntimeGroup = targetContent.Konnect.RuntimeGroupName
+	}
 	client, err := getKonnectClient(ctx)
 	if err != nil {
 		return err
 	}
+
+	dumpConfig.KonnectRuntimeGroup = konnectRuntimeGroup
 
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
 	if err != nil {
@@ -225,6 +230,20 @@ func fetchKongControlPlaneID(ctx context.Context,
 	}
 
 	return singleOutKongCP(controlPlanes)
+}
+
+func fetchKongRuntimeGroupID(ctx context.Context,
+	client *konnect.Client) (string, error) {
+	runtimeGroups, _, err := client.RuntimeGroups.List(ctx, nil)
+	if err != nil {
+		return "", fmt.Errorf("fetching runtime groups: %w", err)
+	}
+	for _, rg := range runtimeGroups {
+		if *rg.Name == konnectRuntimeGroup {
+			return *rg.ID, nil
+		}
+	}
+	return "", fmt.Errorf("runtime groups not found: %s", konnectRuntimeGroup)
 }
 
 func singleOutKongCP(controlPlanes []konnect.ControlPlane) (string, error) {

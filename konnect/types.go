@@ -19,6 +19,13 @@ func BaseURL() string {
 	return baseURL
 }
 
+// RuntimeGroup represents a Runtime Group in Konnect.
+// +k8s:deepcopy-gen=true
+type RuntimeGroup struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
 // ServicePackage represents a Service Package in Konnect.
 // +k8s:deepcopy-gen=true
 type ServicePackage struct {
