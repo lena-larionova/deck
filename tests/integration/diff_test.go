@@ -1,4 +1,4 @@
-//go:build integration
+//gso:build integration
 
 package integration
 
