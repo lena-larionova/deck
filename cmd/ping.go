@@ -27,6 +27,10 @@ can connect to Kong's Admin API.`,
 			if mode == modeKonnect {
 				// get Konnect client
 				httpClient := utils.HTTPClient()
+				_, err := getKonnectClient(ctx)
+				if err != nil {
+					return err
+				}
 				konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 				if err != nil {
 					return err
